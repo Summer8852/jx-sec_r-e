@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.ProjectTrainingVideoMapper">
+
+    <!--查询工人项目培训观看视频-->
+    <select id="queryPTVByPTId" parameterType="java.util.HashMap" resultType="com.fantacg.common.vo.answer.VideoListVO">
+        SELECT
+        vi.title,
+        tv.video_id,
+        vi.video_url,
+        vi.cover_url,
+        tv.in_user_name
+        FROM
+	    tb_project_training_video tv
+	    LEFT JOIN tb_video_info vi ON tv.video_id = vi.id
+        WHERE
+	    tv.project_training_id = #{projectTrainingId}
+	    AND tv.training_sys_no = #{trainingSysNo}
+    </select>
+
+    <!--添加培训方案视频-->
+    <insert id="insertProjectTrainingVideo" parameterType="java.util.ArrayList">
+        INSERT INTO tb_project_training_video(project_training_id,training_sys_no,video_id,in_user_name,in_date)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectTrainingId}, #{item.trainingSysNo}, #{item.videoId}, #{item.inUserName},  #{item.inDate})
+        </foreach>
+    </insert>
+
+</mapper>

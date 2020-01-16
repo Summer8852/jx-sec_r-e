@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.worker.mapper.WorkerInfoMapper">
+
+    <!--分页查询人员数据表-->
+    <select id="selectWorkerInfoByPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.worker.WorkerInfo">
+        SELECT
+        wi.`id`,
+        wi.`name`,
+        wi.`id_card_type`,
+        wi.`id_card_number`,
+        wi.`gender`,
+        wi.`nation`,
+        wi.`edu_level`,
+        wi.`degree`,
+        wi.`worker_type`,
+        wi.`birthday`,
+        wi.`birth_place_code`,
+        wi.`address`,
+        wi.`head_image_url`,
+        wi.`politics_type`,
+        wi.`is_joined`,
+        wi.`joined_time`,
+        wi.`cell_phone`,
+        wi.`culture_level_type`,
+        wi.`specialty`,
+        wi.`has_bad_medical_history`,
+        wi.`urgent_link_man`,
+        wi.`urgent_link_man_phone`,
+        wi.`work_type_code`,
+        wi.`work_corp_name`,
+        wi.`work_date`,
+        wi.`marital_status`,
+        wi.`grant_org`,
+        wi.`positive_idcard_image_url`,
+        wi.`negative_idcard_image_url`,
+        wi.`start_date`,
+        wi.`expiry_date`
+        FROM
+        pb_worker_info wi
+        where wi.`in_user_name` = #{memberId}
+        order by #{orderByClause}
+    </select>
+
+    <!--身份证号 身份证姓名 查询身份证信息-->
+    <select id="queryWorkerInfoByCard" resultType="com.fantacg.common.pojo.worker.WorkerInfo">
+        SELECT
+        wi.id,
+        wi.`name`,
+        wi.id_card_type,
+        wi.id_card_number,
+        wi.gender,
+        wi.nation,
+        wi.edu_level,
+        wi.degree,
+        wi.worker_type,
+        wi.birthday,
+        wi.birth_place_code,
+        wi.address,
+        wi.head_image_url,
+        wi.politics_type,
+        wi.is_joined,
+        wi.joined_time,
+        wi.cell_phone,
+        wi.culture_level_type,
+        wi.specialty,
+        wi.has_bad_medical_history,
+        wi.urgent_link_man,
+        wi.urgent_link_man_phone,
+        wi.work_type_code,
+        wi.work_corp_name,
+        wi.work_date,
+        wi.marital_status,
+        wi.grant_org,
+        wi.positive_idcard_image_url,
+        wi.negative_idcard_image_url,
+        wi.start_date,
+        wi.expiry_date
+        FROM
+        pb_worker_info wi
+        WHERE wi.id_card_number = #{idCardNumber}
+        <if test="name != null and name != ''">
+            AND wi.`name` = #{name}
+        </if>
+    </select>
+
+    <!--身份证信息修改-->
+    <update id="updateWorkerInfoByCard" parameterType="com.fantacg.common.pojo.worker.WorkerInfo">
+        UPDATE pb_worker_info wi
+        SET
+        <if test="name != null and name !=''">
+            wi.name = #{name,jdbcType=VARCHAR} ,
+        </if>
+        <if test="idCardType != null and idCardType !=''">
+            wi.id_card_type = #{idCardType,jdbcType=VARCHAR} ,
+        </if>
+        <if test="idCardNumber != null and idCardNumber !=''">
+            wi.id_card_number = #{idCardNumber,jdbcType=VARCHAR} ,
+        </if>
+        <if test="gender != null and gender !=''">
+            wi.gender = #{gender,jdbcType=VARCHAR},
+        </if>
+        <if test="nation != null and nation !=''">
+            wi.nation = #{nation,jdbcType=VARCHAR} ,
+        </if>
+        <if test="eduLevel != null and eduLevel !=''">
+            wi.edu_level = #{eduLevel,jdbcType=VARCHAR} ,
+        </if>
+        <if test="degree != null">
+            wi.degree = #{degree} ,
+        </if>
+        <if test="workerType != null and workerType !=''">
+            wi.worker_type = #{workerType,jdbcType=VARCHAR} ,
+        </if>
+        <if test="birthday != null">
+            wi.birthday = #{birthday,jdbcType=TIMESTAMP} ,
+        </if>
+        <if test="birthPlaceCode != null and birthPlaceCode !=''">
+            wi.birth_place_code = #{birthPlaceCode,jdbcType=VARCHAR} ,
+        </if>
+        <if test="address != null and address !=''">
+            wi.address = #{address,jdbcType=VARCHAR} ,
+        </if>
+        <if test="headImageUrl != null and headImageUrl !=''">
+            wi.head_image_url = #{headImageUrl,jdbcType=VARCHAR} ,
+        </if>
+        <if test="politicsType != null and politicsType != ''">
+            wi.politics_type = #{politicsType,jdbcType=VARCHAR} ,
+        </if>
+        <if test="isJoined != null">
+            wi.is_joined = #{isJoined} ,
+        </if>
+        <if test="joinedTime != null">
+            wi.joined_time = #{joinedTime,jdbcType=TIMESTAMP} ,
+        </if>
+        <if test="cellPhone != null and cellPhone != ''">
+            wi.cell_phone = #{cellPhone,jdbcType=VARCHAR} ,
+        </if>
+        <if test="cultureLevelType != null and cultureLevelType != ''">
+            wi.culture_level_type = #{cultureLevelType,jdbcType=VARCHAR} ,
+        </if>
+        <if test="specialty != null and specialty != ''">
+            wi.specialty = #{specialty,jdbcType=VARCHAR} ,
+        </if>
+        <if test="hasBadMedicalHistory != null">
+            wi.has_bad_medical_history = #{hasBadMedicalHistory} ,
+        </if>
+        <if test="urgentLinkMan != null and urgentLinkMan != ''">
+            wi.urgent_link_man = #{urgentLinkMan,jdbcType=VARCHAR} ,
+        </if>
+        <if test="urgentLinkManPhone != null and urgentLinkManPhone != ''">
+            wi.urgent_link_man_phone = #{urgentLinkManPhone,jdbcType=VARCHAR} ,
+        </if>
+        <if test="workTypeCode != null and workTypeCode != ''">
+            wi.work_type_code = #{workTypeCode,jdbcType=VARCHAR} ,
+        </if>
+        <if test="workCorpName != null and workCorpName != '' != null and idCardType !=''">
+            wi.work_corp_name = #{workCorpName,jdbcType=VARCHAR} ,
+        </if>
+        <if test="workDate != null">
+            wi.work_date = #{workDate} ,
+        </if>
+        <if test="maritalStatus != null and maritalStatus != ''">
+            wi.marital_status = #{maritalStatus,jdbcType=VARCHAR} ,
+        </if>
+        <if test="grantOrg != null and grantOrg != ''">
+            wi.grant_org = #{grantOrg,jdbcType=VARCHAR} ,
+        </if>
+        <if test="positiveIdCardImageUrl != null and positiveIdCardImageUrl != '' != null and idCardType !=''">
+            wi.positive_id_card_image_url = #{positiveIdCardImageUrl,jdbcType=VARCHAR} ,
+        </if>
+        <if test="negativeIdCardImageUrl != null and negativeIdCardImageUrl != ''">
+            wi.negative_id_card_image_url = #{negativeIdCardImageUrl,jdbcType=VARCHAR} ,
+        </if>
+        <if test="startDate != null">
+            wi.start_date = #{startDate} ,
+        </if>
+        <if test="expiryDate != null">
+            wi.expiry_date = #{expiryDate,jdbcType=TIMESTAMP} ,
+        </if>
+        wi.edit_date = NOW()
+        WHERE
+        wi.id_card_number = #{idCardNumber} ;
+    </update>
+
+    <!--查询班主是否存在人员信息-->
+    <select id="selectProjectWorker" parameterType="com.fantacg.common.dto.worker.ProjectWorkerDto"
+            resultType="java.util.HashMap">
+        SELECT id,team_sys_no FROM pb_project_worker
+        WHERE id_card_number = #{idCardNumber}
+        and in_user_name = #{inUserName}
+        <if test="projectCode !=null and projectCode !=''">
+            and project_code = #{projectCode}
+        </if>
+    </select>
+
+    <!--添加到人员信息-->
+    <insert id="addProjectWorker" parameterType="com.fantacg.common.dto.worker.ProjectWorkerDto">
+        INSERT INTO pb_project_worker
+        (id, project_code, corp_code, corp_name, team_sys_no, worker_name, is_team_leader, id_card_type, id_card_number, work_type, worker_role, in_user_name, entry_time,in_date )
+        VALUES ( #{id}, #{projectCode}, #{corpCode}, #{corpName}, #{teamSysNo}, #{workerName},  #{isTeamLeader}, #{idCardType}, #{idCardNumber}, #{workType}, #{workerRole}, #{inUserName}, NOW(), NOW());
+    </insert>
+
+    <!--修改工人信息-->
+    <insert id="updateProjectWorker" parameterType="com.fantacg.common.dto.worker.ProjectWorkerDto">
+        update pb_project_worker SET
+        team_sys_no = #{teamSysNo,jdbcType=VARCHAR}
+        WHERE id_card_number = #{idCardNumber}
+        and in_user_name = #{inUserName}
+    </insert>
+
+</mapper>

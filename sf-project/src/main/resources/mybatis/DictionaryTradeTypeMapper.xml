@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.DictionaryTradeTypeMapper">
+
+    <!--查询所有未删除的企业资质资格专业类别字典表-->
+    <select id="dicTradeTypeList" resultType="com.fantacg.common.dto.project.DictVO">
+        SELECT
+            pdtt.id,
+            pdtt.`value`,
+            pdtt.label,
+            pdtt.description,
+            pdtt.parent_id
+        FROM
+            pb_dic_trade_type pdtt
+        WHERE
+            pdtt.del_flag = 0
+    </select>
+
+</mapper>

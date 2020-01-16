@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.ProjectPblPcMapper">
+
+    <!--  根据id查询  -->
+    <select id="selectProjectPblPcByProjectId"  resultType="com.fantacg.common.pojo.project.ProjectPblPc">
+        SELECT `id`, `project_info_id`, `pbl_id`, `pc_id`, `tm_id`
+        FROM pb_project_pbl_pc
+        WHERE project_info_id = #{projectId}
+        and in_user_name =#{memberId}
+    </select>
+
+</mapper>

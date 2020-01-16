@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.ProjectTrainingDetailMapper">
+
+    <!--查询项目培训详情-->
+    <select id="queryProjectTrainingDetails" parameterType="com.fantacg.common.dto.answer.ProjectTrainingDto"
+            resultType="com.fantacg.common.vo.answer.ProjectTrainingDetailVO">
+        SELECT
+            ptd.`id`,
+            wi.`name`,
+            ptd.`project_training_id`,
+            ptd.`training_sys_no`,
+            ptd.`id_card_type`,
+            ptd.`id_card_number`,
+            ptd.`is_pass`,
+            ptd.`score`,
+            ptd.`in_user_name`,
+            ptd.`in_date`,
+            ptd.`edit_user_name`
+        FROM
+            pb_project_training_detail ptd
+            LEFT JOIN pb_worker_info wi ON ptd.id_card_number = wi.id_card_number
+            LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        WHERE
+            pt.in_user_name = #{memberId,jdbcType=BIGINT}
+            AND ptd.project_training_id = #{id,jdbcType=VARCHAR}
+            AND ptd.training_sys_no = #{sysNo,jdbcType=VARCHAR}
+    </select>
+
+    <!--查询培训附件-->
+    <select id="queryFileAttachmentInfos" parameterType="com.fantacg.common.dto.answer.ProjectTrainingDto"
+            resultType="com.fantacg.common.vo.answer.FileAttachmentInfoVO">
+        SELECT id,name,url from pb_file_attachment_info
+        WHERE is_del = 0
+        AND business_type ='002'
+        AND business_sys_no = #{id,jdbcType=VARCHAR}
+        AND in_user_name = #{memberId,jdbcType=BIGINT}
+    </select>
+
+    <!--分页查询培训人在当前账号下的培训详情-->
+    <select id="queryProjectTrainingDetailsByCardId" resultType="com.fantacg.common.vo.answer.ProjectTrainingDetailVO">
+        SELECT
+            ptd.`id`,
+            wi.`name`,
+            ptd.`project_training_id`,
+            ptd.`training_sys_no`,
+            pt.`training_name`,
+            ptd.`id_card_type`,
+            ptd.`id_card_number`,
+            ptd.`is_pass`,
+            ptd.`score`,
+            ptd.`in_user_name`,
+            ptd.`in_date`,
+            ptd.`edit_user_name`
+        FROM
+            pb_project_training_detail ptd
+            LEFT JOIN pb_worker_info wi ON ptd.id_card_number = wi.id_card_number
+            LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        WHERE
+            pt.in_user_name = #{memberId}
+            AND ptd.id_card_number = #{idCardNumber}
+    </select>
+
+    <!--批量添加培训结果-->
+    <insert id="insertProjectTrainingDetails" parameterType="java.util.ArrayList">
+        INSERT INTO pb_project_training_detail(`id`, `project_training_id`, `training_sys_no`, `id_card_type`,
+        `id_card_number`, `is_pass`, `score`, `in_date`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.projectTrainingId}, #{item.trainingSysNo}, #{item.idCardType}, #{item.idCardNumber},
+            #{item.isPass}, #{item.score}, #{item.inDate})
+        </foreach>
+    </insert>
+
+</mapper>

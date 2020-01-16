@@ -1,0 +1,30 @@
+1、查看你当前的内核版本 Docker 要求 CentOS 系统的内核版本高于 3.10
+    uname -r
+2、安装Docker
+    yum update -y
+    yum -y install docker
+3、启动Docker
+    systemctl start docker
+4、设置镜像
+	vi /etc/docker/daemon.json
+    {
+      "registry-mirrors": ["https://aj2rgad5.mirror.aliyuncs.com"]
+    }
+5、开放管理端口映射
+    1.vi /lib/systemd/system/docker.service
+    2.将第11行的ExecStart=/usr/bin/dockerd，替换为:
+    ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock -H tcp://0.0.0.0:7654
+    3. 在~/.bashrc中写入docker管理端口
+    vi ~/.bashrc
+    export DOCKER_HOST=tcp://0.0.0.0:2375
+5.  source ~/.bashrc
+6、重启docker
+    systemctl daemon-reload
+    systemctl restart docker.service
+
+附加命令
+停止所有未启动镜像
+docker stop $(docker ps -a -q)
+删除所未启动镜像
+docker rm $(docker ps -a -q)
+

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.ProjectWorkerMapper">
+
+    <!--  筛选班组-人员实名信息列表  -->
+    <select id="screeningProjectWorker" parameterType="com.fantacg.common.dto.project.ProjectWorkerDTO"
+            resultType="com.fantacg.common.dto.project.ProjectWorkerVO">
+        SELECT
+        pw.id,
+        wi.`name`,
+        pw.id_card_number,
+        pw.is_team_leader,
+        pw.entry_time,
+        wi.gender,
+        wi.nation,
+        wi.birthday,
+        wi.birth_place_code,
+        wi.address,
+        wi.cell_phone
+        FROM
+        pb_project_worker pw
+        LEFT JOIN pb_worker_info wi ON pw.id_card_number = wi.id_card_number
+        WHERE 1 = 1 AND pw.exit_time is NULL
+        AND pw.in_user_name = #{memberId}
+        <if test="corpCode != null and corpCode !=''">
+            AND pw.corp_code = #{corpCode}
+        </if>
+        <if test="projectCode != null and projectCode != ''">
+            AND pw.project_code = #{projectCode}
+        </if>
+        <if test="teamSysNo != null and teamSysNo != ''">
+            AND pw.team_sys_no = #{teamSysNo}
+        </if>
+        <if test="workType != null and workType != ''">
+            AND pw.work_type = #{workType}
+        </if>
+        <if test="startTime != null and endTime != null">
+            AND pw.entry_time &gt;= #{startTime} and pw.entry_time &lt;= #{endTime}
+        </if>
+        <if test="idCardNumber != null and idCardNumber != ''">
+            AND pw.id_card_number like #{idCardNumber}
+        </if>
+        <if test="workerName != null and workerName != ''">
+            AND pw.worker_name like #{workerName}
+        </if>
+        order by pw.in_date DESC
+    </select>
+
+    <!--  筛选班组-人员实名信息列表(创建项目)  -->
+    <select id="screeningProjectWorkerByTraining" parameterType="com.fantacg.common.dto.project.ProjectWorkerDTO"
+            resultType="com.fantacg.common.dto.project.PtmVO">
+        SELECT
+        wi.`name`,
+        pw.id_card_number
+        FROM
+        pb_project_worker pw
+        LEFT JOIN pb_worker_info wi ON pw.id_card_number = wi.id_card_number
+        WHERE 1 = 1 AND pw.exit_time is NULL
+        AND pw.in_user_name = #{memberId}
+        <if test="corpCode != null and corpCode !=''">
+            AND pw.corp_code = #{corpCode}
+        </if>
+        <if test="projectCode != null and projectCode != ''">
+            AND pw.project_code = #{projectCode}
+        </if>
+        <if test="teamSysNo != null and teamSysNo != ''">
+            AND pw.team_sys_no = #{teamSysNo}
+        </if>
+        <if test="workType != null and workType != ''">
+            AND pw.work_type = #{workType}
+        </if>
+        <if test="startTime != null and endTime != null">
+            AND pw.entry_time &gt;= #{startTime} and pw.entry_time &lt;= #{endTime}
+        </if>
+        <if test="idCardNumber != null and idCardNumber != ''">
+            AND pw.id_card_number like #{idCardNumber}
+        </if>
+        <if test="workerName != null and workerName != ''">
+            AND pw.worker_name like #{workerName}
+        </if>
+        order by pw.in_date DESC
+    </select>
+
+    <!--批量或单个删除班组人员信息-->
+    <delete id="delProjectWorker">
+        DELETE FROM pb_project_worker WHERE in_user_name = #{memberId} AND id IN
+        <foreach item="item" collection="lists" separator="," open="(" close=")" index="">
+            #{item, jdbcType=INTEGER}
+        </foreach>
+    </delete>
+
+    <!--分页查询班组人员信息列表-->
+    <select id="queryProjectWorkerBySysNoPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.dto.project.ProjectWorkerVO">
+        SELECT
+        pw.id,
+        wi.`name`,
+        pw.id_card_number,
+        pw.is_team_leader,
+        pw.entry_time,
+        wi.gender,
+        wi.nation,
+        wi.birthday,
+        wi.birth_place_code,
+        wi.address,
+        wi.cell_phone
+        FROM
+        pb_project_worker pw
+        LEFT JOIN pb_worker_info wi ON pw.id_card_number = wi.id_card_number
+        WHERE 1 = 1
+        and pw.in_user_name = #{memberId}
+        and pw.team_sys_no = #{teamSysNo}
+        order by pw.in_date DESC
+    </select>
+
+    <!--修改班组组长状态-->
+    <update id="updateIsTeamLeader">
+        UPDATE pb_project_worker
+        SET  is_team_leader = #{isTeamLeader}
+        WHERE id_card_number =#{idCardNumber}
+        AND team_sys_no = #{teamSysNo}
+    </update>
+
+    <insert id="addEmpsBatch" parameterType="java.util.ArrayList">
+        INSERT INTO pb_project_worker(id, corp_code, project_code, team_sys_no, worker_name, is_team_leader,
+        id_card_type, id_card_number, work_type, worker_role, in_user_name,entry_time, in_date )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.corpCode}, #{item.projectCode}, #{item.teamSysNo},
+            #{item.workerName},
+            #{item.isTeamLeader}, #{item.idCardType}, #{item.idCardNumber}, #{item.workType}, #{item.workerRole},
+            #{item.inUserName}, NOW(), NOW())
+        </foreach>
+    </insert>
+</mapper>

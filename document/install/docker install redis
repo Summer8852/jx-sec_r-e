@@ -1,0 +1,6 @@
+1、	查找Docker Hub上的redis镜像
+    docker search redis
+2、	拉取官方的镜像,标签为5.6
+    docker pull redis:3.2
+3、	运行容器
+    docker run -p 6379:6379 -v /usr/local/fantacg/redis/data:/data -d redis:3.2 redis-server --appendonly yes

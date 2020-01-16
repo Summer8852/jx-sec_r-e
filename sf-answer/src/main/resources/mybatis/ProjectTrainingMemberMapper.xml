@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.ProjectTrainingMemberMapper">
+    <!--添加参与培训人员-->
+    <insert id="insertProjectTrainingMember" parameterType="java.util.ArrayList">
+        INSERT INTO tb_project_training_member( `project_training_id`, `training_sys_no`, `id_card_number`, `is_training`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.projectTrainingId}, #{item.trainingSysNo}, #{item.idCardNumber},#{item.isTraining})
+        </foreach>
+    </insert>
+
+    <!--删除 参与培训人员-->
+    <update id="updateProjectTrainingMember" parameterType="com.fantacg.common.pojo.answer.ProjectTrainingMember">
+        UPDATE tb_project_training_member
+        SET is_training = 1, training_date = NOW()
+        WHERE project_training_id = #{projectTrainingId}
+        AND  id_card_number = #{idCardNumber}
+        AND  training_sys_no = #{trainingSysNo}
+    </update>
+
+</mapper>

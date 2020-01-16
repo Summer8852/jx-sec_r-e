@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.video.mapper.VideoPriceMapper">
+    <!--  查询视频最小的价格  -->
+    <select id="queryMinPriceByVideoId" parameterType="string" resultType="string">
+        SELECT min(price) price FROM tb_video_price WHERE is_del = 0 AND video_id = #{videoId}
+    </select>
+
+    <!--  查询视频价格  -->
+    <select id="queryPriceByVideoId" parameterType="string" resultType="java.util.HashMap">
+        SELECT id,number,type,time_type timeType, price FROM tb_video_price WHERE is_del = 0 AND video_id = #{videoId}
+    </select>
+
+    <!--  修改视频价格  -->
+    <update id="updateVideoPrice" parameterType="com.fantacg.common.pojo.video.VideoPrice">
+        UPDATE tb_video_price SET
+        <if test="number !=null and number != '' ">
+            number = #{number},
+        </if>
+        <if test="price !=null and price != ''">
+            price = #{price},
+        </if>
+        <if test="type !=null and type != ''">
+            type = #{type},
+        </if>
+        <if test="timeType !=null and timeType != ''">
+            time_type = #{timeType},
+        </if>
+            edit_user_name = #{editUserName},
+            edit_date = #{editDate}
+        WHERE is_del = 0
+        AND id = #{id}
+        AND video_id = #{videoId}
+    </update>
+
+    <!--  删除视频价格  -->
+    <update id="deleteVideoPrice" parameterType="com.fantacg.common.pojo.video.VideoPrice">
+        UPDATE tb_video_price SET
+        is_del = 1,
+        edit_user_name = #{editUserName},
+        edit_date = #{editDate}
+        WHERE is_del = 0
+        AND id = #{id}
+    </update>
+
+    <!--  查询视频价格  -->
+    <select id="queryPriceById" parameterType="long" resultType="HashMap">
+        SELECT id,number,type,time_type timeType, price FROM tb_video_price WHERE is_del = 0 AND id = #{id}
+    </select>
+
+</mapper>

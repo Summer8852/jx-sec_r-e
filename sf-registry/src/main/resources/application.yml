@@ -1,0 +1,26 @@
+server:
+  port: 8079
+  tomcat:
+    max-threads: 2000
+spring:
+  application:
+    name: sf-registry
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+# eureka注册中心服务端
+eureka:
+  instance:
+    hostname: 127.0.0.1
+  client:
+    fetch-registry: false #服务发现，是否从Eureka中获取注册信息
+    register-with-eureka: false #服务注册，是否将自己注册到Eureka服务中
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enable-self-preservation: true # 关闭自我保护
+    eviction-interval-timer-in-ms: 60000 # 每隔60秒进行一次服务列表清理
+    remote-region-connection-idle-timeout-seconds: 30  #http连接被清理之后远程地区服务器的空闲时间，默认为30秒

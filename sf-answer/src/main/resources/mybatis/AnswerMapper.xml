@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.AnswerMapper">
+    <!-- 根据工种查询试题列表 -->
+    <select id="queryAnswerListByWorkType" parameterType="string" resultType="com.fantacg.common.pojo.answer.Answer">
+        SELECT answer_id,video_id,problem,A,B,C,D,right_key,levels,mp4_file,work_type_id FROM  tb_answer WHERE work_type_id = #{workType}
+    </select>
+
+    <!-- 添加试题 -->
+    <insert id="addAnswer" parameterType="com.fantacg.common.pojo.answer.Answer">
+        INSERT INTO tb_answer (video_id, problem, A, B, C, D, right_key, levels, mp4_file, work_type_id )
+        VALUES (#{videoId},#{problem},#{a},#{b},#{c},#{d},#{rightKey},#{levels},#{mp4File},#{workTypeId});
+    </insert>
+
+    <!-- 单个/批量删除试题 -->
+    <delete id="delAnswer">
+        DELETE FROM
+        tb_answer
+        where answer_id in
+        <foreach collection="answerId" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--修改试题-->
+    <update id="updateAnswer">
+        UPDATE tb_answer
+        SET video_id = #{videoId},
+            problem = #{problem},
+            A = #{A},
+            B = #{B},
+            C = #{C},
+            D = #{D},
+            right_key = #{rightkey},
+            levels =#{levels},
+            mp4_file = #{mp4File},
+            work_type_id = #{workTypeId}
+        WHERE
+	        answer_id = #{answerId};
+    </update>
+
+    <!--根据视频id查询试题-->
+    <select id="queryAnswerListByVideoId" resultType="com.fantacg.common.pojo.answer.Answer">
+        SELECT answer_id,video_id,problem,A,B,C,D,right_key,levels,mp4_file,work_type_id
+        FROM tb_answer
+        WHERE 1=1
+        <if test="videoId != null and videoId !=''">
+            AND video_id = #{videoId}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.PandectMapper">
+
+    <!--查询项目 班组 人员数量-->
+    <select id="queryProTmPwCount" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        COUNT( id ) cbNum,
+        (SELECT COUNT( id ) FROM pb_project_info WHERE <![CDATA[ prj_status != '000' ]]> AND in_user_name = #{memberId}) pNum,
+        ( SELECT COUNT( id ) FROM pb_team_master WHERE <![CDATA[ is_del != 1 ]]> 	AND in_user_name = #{memberId} ) tmNum,
+        ( SELECT COUNT( id ) FROM pb_project_training WHERE <![CDATA[ training_status != -1 ]]> AND in_user_name = #{memberId} ) ptNum,
+        ( SELECT COUNT( id ) FROM pb_project_worker WHERE  in_user_name = #{memberId} ) pwNum
+        FROM pb_corp_basic_info
+        WHERE <![CDATA[ is_del != 1 ]]>
+        and	 in_user_name = #{memberId}
+
+    </select>
+
+    <select id="queryPtList" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        ptd.id,
+        ptd.project_training_id,
+        ptd.training_sys_no,
+        wi.`name`,
+        ptd.id_card_number,
+        pt.training_name,
+        pt.training_type_code,
+        ptd.is_pass,
+        ptd.score,
+        date_format(ptd.in_date,'%Y/%m/%d %T') in_date
+        FROM
+        pb_project_training_detail ptd
+        LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        LEFT JOIN pb_worker_info wi ON ptd.id_card_number = wi.id_card_number
+        WHERE
+        <![CDATA[ pt.training_status != -1 ]]>
+        AND pt.in_user_name = #{memberId}
+        ORDER BY ptd.in_date desc
+    </select>
+
+    <!--查询 及格 不及格人数-->
+    <select id="queryPassRate" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        SUM( CASE WHEN ptd.score >= 60 THEN 1 ELSE 0 END ) pass ,
+        SUM( CASE WHEN ptd.score >= 60 THEN 0 ELSE 1 END ) fail
+        FROM
+        pb_project_training_detail ptd
+        LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        LEFT JOIN pb_worker_info wi ON ptd.id_card_number = wi.id_card_number
+        WHERE
+        pt.in_user_name = #{memberId}
+    </select>
+
+    <!--查询一周内每天答题人数-->
+    <select id="queryWeekAnswerNum" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        a.in_date,
+        ifnull( b.count, 0 ) AS count
+        FROM
+            (
+        SELECT
+            curdate( ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 1 DAY ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 2 DAY ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 3 DAY ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 4 DAY ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 5 DAY ) AS in_date UNION ALL
+        SELECT
+            date_sub( curdate( ), INTERVAL 6 DAY ) AS in_date
+            ) a
+            LEFT JOIN (
+        SELECT
+            date( ptd.in_date ) AS datetime,
+            count( pt.id ) AS count
+        FROM
+            pb_project_training_detail ptd
+            LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        WHERE
+            pt.in_user_name = #{memberId}
+        GROUP BY
+            date( ptd.in_date )
+            ) b ON a.in_date = b.datetime
+        ORDER BY
+        a.in_date ASC
+    </select>
+    <!--查询一周内每天答题人数-->
+    <select id="queryWorkerProportion" parameterType="long" resultType="java.util.HashMap">
+        SELECT
+        d.label,
+        count(pw.id) num
+        FROM
+        pb_dictionary d
+        LEFT JOIN pb_project_worker pw ON d.`value` = pw.work_type
+        WHERE
+        d.type = "WORKTYPE"
+        and pw.in_user_name = #{memberId}
+        GROUP BY d.`value`
+    </select>
+
+</mapper>

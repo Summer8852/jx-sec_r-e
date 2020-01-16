@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.ProjectInfoMapper">
+
+    <!--  分页查询项目列表  -->
+    <select id="selectAllProjectListByPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.project.ProjectInfo">
+        SELECT
+        pi.id,
+        pi.`code`,
+        pi.contractor_corp_id,
+        cbi.corp_code contractor_corp_code,
+        cbi.corp_name contractor_corp_name,
+        pi.`name`,
+        pi.description,
+        pi.category,
+        a.label category_name,
+        cbis.corp_name build_corp_name,
+        cbis.corp_code build_corp_code,
+        pi.build_corp_id,
+        pi.build_plan_num,
+        pi.prj_plan_num,
+        pi.area_code,
+        pi.invest,
+        pi.building_area,
+        pi.building_length,
+        pi.start_date,
+        pi.complete_date,
+        pi.link_man,
+        pi.link_phone,
+        pi.prj_status,
+        b.label status_name ,
+        pi.lng,
+        pi.lat,
+        pi.address,
+        pi.approval_num,
+        pi.approval_level_num,
+        pi.prj_size,
+        pi.property_num,
+        pi.prj_num,
+        pi.nation_num,
+        pi.third_party_project_code
+        FROM
+        pb_project_info pi
+        LEFT JOIN pb_corp_basic_info cbi ON pi.contractor_corp_id = cbi.id
+        LEFT JOIN pb_corp_basic_info cbis ON pi.build_corp_id = cbis.id
+        LEFT JOIN (SELECT `value`,label FROM pb_dictionary where type ="PRJCATEGORY") a ON pi.category = a.`value`
+        LEFT JOIN (SELECT `value`,label FROM pb_dictionary where type ="PRJSTATUS") b ON pi.prj_status = b.`value`
+        WHERE pi.prj_status != '000' AND pi.in_user_name= #{memberId}
+        <if test="name != null">
+            and pi.`name` like #{name}
+        </if>
+        <if test="searchCateId != null">
+            and pi.category = #{searchCateId}
+        </if>
+        order by pi.in_date DESC
+    </select>
+
+    <!--  查询我的项目编号是否唯一  -->
+    <select id="selectProjectInfByCode" resultType="int">
+        SELECT count(id) FROM pb_project_info
+        WHERE code = #{code} AND in_user_name = #{memberId}
+    </select>
+
+    <!-- 根据id查询项目详情  -->
+    <select id="selectProjectListById" parameterType="long" resultType="com.fantacg.common.pojo.project.ProjectInfo">
+       SELECT
+            pi.id,
+            pi.`code`,
+            pi.contractor_corp_id,
+            cbi.corp_code contractor_corp_code,
+            cbi.corp_name contractor_corp_name,
+            pi.`name`,
+            pi.description,
+            pi.category,
+            cbis.corp_name build_corp_name,
+            cbis.corp_code build_corp_code,
+            pi.build_corp_id,
+            pi.build_plan_num,
+            pi.prj_plan_num,
+            pi.area_code,
+            pi.invest,
+            pi.building_area,
+            pi.building_length,
+            pi.start_date,
+            pi.complete_date,
+            pi.link_man,
+            pi.link_phone,
+            pi.prj_status,
+            pi.lng,
+            pi.lat,
+            pi.address,
+            pi.approval_num,
+            pi.approval_level_num,
+            pi.prj_size,
+            pi.property_num,
+            pi.prj_num,
+            pi.nation_num,
+            pi.third_party_project_code
+        FROM pb_project_info pi
+        LEFT JOIN pb_corp_basic_info cbi ON pi.contractor_corp_id = cbi.id
+        LEFT JOIN pb_corp_basic_info cbis ON pi.build_corp_id = cbis.id
+		WHERE  pi.prj_status !='000'
+        AND pi.id = #{id}
+    </select>
+
+    <!-- 根据id查询项目编码  -->
+    <select id="selectProjectCodeById" parameterType="long" resultType="string">
+        SELECT `code` FROM pb_project_info  where id = #{id}
+    </select>
+
+    <!-- 查询第三方项目最大编号  -->
+    <select id="selectThirdPartyProjectCodeMax" resultType="String">
+        SELECT MAX(third_party_project_code) strMax FROM pb_project_info
+    </select>
+
+    <!--根性项目的最新企业信息-->
+    <update id="updateProjectInfo" parameterType="com.fantacg.common.pojo.project.ProjectInfo">
+        UPDATE `pb_project_info`
+        SET
+        `contractor_corp_code` = #{contractorCorpCode},
+        `contractor_corp_name` = #{contractorCorpName},
+        `build_corp_name` = #{buildCorpName},
+        `build_corp_code` = #{buildCorpCode}
+        WHERE
+        `id` = #{id};
+    </update>
+
+    <!--查询项目编号和项目名称-->
+    <select id="selectProjectCodeAll" parameterType="long" resultType="com.fantacg.common.dto.project.ProjectVo">
+        SELECT id project_id, code, name
+        FROM pb_project_info
+        WHERE  prj_status != '000' AND in_user_name= #{memberId}
+    </select>
+
+</mapper>

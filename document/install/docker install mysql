@@ -1,0 +1,22 @@
+1、	查找Docker Hub上的mysql镜像
+    docker search mysql
+
+2、	拉取官方的镜像,标签为5.6
+    docker pull mysql:5.6
+
+3、	查到REPOSITORY为mysql,标签为5.6的镜像
+    docker images |grep mysql
+
+4、	运行容器
+    docker run --name mysql -p 3306:3306 -v  /usr/local/fantacg/mysql/data:/var/lib/mysql -v  /usr/local/fantacg/mysql/conf/conf.d:/etc/mysql/conf.d -e  MYSQL_ROOT_PASSWORD=root -d mysql:5.6
+5.查看重启启动情况
+    docker ps
+
+
+附加命令操作
+进入mysql 命令行:docker exec -it mysql mysql -uroot -p
+进入容器:docker exec -it mysql bash
+停止:docker stop mysql
+启动:docker start mysql
+重启:docker restart mysql
+删除容器:docker rm mysql

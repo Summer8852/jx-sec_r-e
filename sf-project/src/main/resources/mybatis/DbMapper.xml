@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.DbMapper">
+
+    <!--获取所有表结构(TABLES)-->
+    <select id="tablesALL" parameterType="java.lang.String" resultType="com.fantacg.project.data.vo.TablesVo">
+        select * from information_schema.tables  where table_schema = #{tableSchema}
+    </select>
+
+    <!--获取表字段(COLUMNS)-->
+    <select id="columns" parameterType="java.lang.String" resultType="com.fantacg.project.data.vo.ColumnsVo">
+        SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = #{param1} AND TABLE_NAME= #{param2}
+    </select>
+
+</mapper>

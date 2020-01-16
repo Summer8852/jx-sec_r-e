@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.ProjectBuilderLicenseMapper">
+
+    <!--  根据id查询  -->
+    <select id="selectProjectBuilderLicense" parameterType="long"
+            resultType="com.fantacg.common.pojo.project.ProjectBuilderLicense">
+        SELECT id, project_code,prj_name,builder_license_num
+        FROM pb_project_builder_license
+        WHERE id = #{id}
+    </select>
+
+</mapper>

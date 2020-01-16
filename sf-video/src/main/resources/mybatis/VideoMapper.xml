@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.video.mapper.VideoMapper">
+
+    <!--  管理员查询视频列表  -->
+    <select id="selectAllVideoListByPage" parameterType="java.util.HashMap" resultType="com.fantacg.common.vo.video.VideoVo">
+        SELECT
+        vi.id,
+        vi.title,
+        vi.cate_id ,
+        vi.tags,
+        vi.description,
+        vi.template_group_id ,
+        vi.is_upload ,
+        vi.is_submit ,
+        vi.cover_url ,
+        vi.video_time ,
+        vi.suf,
+        vi.status,
+        vi.create_time ,
+        vi.video_url ,
+        vc.name cate_name
+        FROM
+        tb_video_info vi
+        LEFT JOIN tb_video_category vc ON vi.cate_id = vc.id
+        where 1=1
+        <if test="title!=null and title!='' ">
+            and vi.title like #{title}
+        </if>
+        <if test="searchCateId != null and searchCateId != '' ">
+            and vi.cate_id= #{searchCateId}
+        </if>
+        order by vi.title DESC
+    </select>
+
+    <!--  Id 查询视频详情  -->
+    <select id="selectVideoDetailById" parameterType="java.lang.String" resultType="com.fantacg.common.vo.video.VideoVo">
+        SELECT
+        vi.id,
+        vi.title,
+        vi.cate_id ,
+        vi.tags,
+        vi.description,
+        vi.template_group_id ,
+        vi.is_upload ,
+        vi.is_submit ,
+        vi.cover_url ,
+        vi.video_time ,
+        vi.suf,
+        vi.create_time ,
+        vi.video_url ,
+        vc.name cate_name
+        FROM
+        tb_video_info vi
+        LEFT JOIN tb_video_category vc ON vi.cate_id = vc.id
+        WHERE vi.status = 1
+        AND  vi.id = #{id}
+    </select>
+
+    <!--  查询我购买的视频  -->
+    <select id="selectMyVideoList" parameterType="java.util.HashMap" resultType="com.fantacg.common.pojo.video.Video">
+        SELECT
+        vi.*,
+        vmr.the_rest_times theRestTimes,
+        vmr.buy_time buyTime
+        FROM tb_video_info vi
+        LEFT JOIN tb_video_member_relationship vmr on vi.id=vmr.video_id
+        WHERE vmr.member_id=#{memberId}
+	</select>
+
+    <!--  分页查询我的视频  -->
+    <select id="selectMyVideoListByPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.video.Video">
+        SELECT
+        vi.id,
+        vi.title,
+        vi.cate_id cateId,
+        vi.tags,
+        vi.description,
+        vi.template_group_id templateGroupId,
+        vi.is_upload isUpload,
+        vi.is_submit isSubmit,
+        vi.cover_url coverUrl,
+        vi.video_time videoTime,
+        vi.suf,
+        vi.create_time createTime,
+        vc.name cateName,
+        vmr.the_rest_times theRestTimes
+        FROM
+        tb_video_info vi
+        left join tb_video_category vc on vi.cate_id = vc.id
+        left join tb_video_member_relationship vmr on vi.id=vmr.video_id
+        where 1=1 and vmr.member_id=#{memberId}
+        <if test="title!=null and title!='' ">
+            and vi.title like #{title}
+        </if>
+        <if test="searchCateId!=null and searchCateId!='' ">
+            and vi.cate_id= #{searchCateId}
+        </if>
+        order by #{orderByClause}
+    </select>
+
+    <!--  修改视频封面  -->
+    <update id="updateVideoCoverUrl">
+        UPDATE tb_video_info
+        SET
+        cover_url = #{coverUrl}
+        WHERE
+	    id = #{id};
+    </update>
+
+    <!--  查询推推荐视频  -->
+    <select id="selectVideoListRand" parameterType="java.util.HashMap" resultType="HashMap">
+        SELECT
+            vi.id,
+            vi.title,
+            vi.cate_id cateId,
+            vi.tags,
+            vi.description,
+            vi.template_group_id templateGroupId,
+            vi.is_upload isUpload,
+            vi.is_submit isSubmit,
+            vi.cover_url coverUrl,
+            vi.video_time videoTime,
+            vi.suf,
+            vi.create_time createTime,
+            vi.video_url videoUrl,
+            vc.name cateName
+        FROM
+            tb_video_info vi
+        LEFT JOIN tb_video_category vc ON vi.cate_id = vc.id
+        WHERE vi.status = 1
+        AND vi.cate_id = #{cateId}
+        ORDER BY RAND()
+    </select>
+
+    <!--  上架视频  -->
+    <update id="updateVideoStatus" parameterType="list">
+        UPDATE tb_video_info SET status = 1 WHERE status = 0
+        AND id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--  视频下架  -->
+    <update id="toUndercarriageVideo" parameterType="list">
+        UPDATE tb_video_info SET status = 0 WHERE status = 1
+        AND id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--  分类查询视频  -->
+    <select id="queryVideoByCateId" parameterType="Long" resultType="HashMap">
+        SELECT
+        vi.id,
+        vi.title name,
+        vi.id videoId,
+        vi.video_url videoUrl
+        FROM
+        tb_video_info vi
+        WHERE  vi.status = 1
+        AND vi.cate_id = #{cateId}
+    </select>
+
+    <!--  查询一级分类所有视频  -->
+    <select id="queryVideoByCateIds" parameterType="long" resultType="HashMap">
+        select
+        vi.id,
+        vi.title name,
+        vi.id videoId,
+        vi.video_url videoUrl,
+        vi.video_time videoTime,
+        vi.video_description videoDescription
+        FROM
+        tb_video_info vi
+        where vi.status = 1
+        AND vi.cate_id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by vi.title ASC
+    </select>
+
+    <!--  首页随机查询视频 -->
+    <select id="queryVideoRandom" parameterType="integer" resultType="com.fantacg.common.pojo.video.Video">
+        SELECT * FROM tb_video_info ORDER BY RAND() LIMIT #{num,jdbcType=INTEGER};
+    </select>
+
+</mapper>

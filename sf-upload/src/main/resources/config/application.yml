@@ -1,0 +1,65 @@
+server:
+  port: 8085
+  tomcat:
+    max-threads: 2000
+spring:
+  application:
+    name: upload-service
+  profiles:
+    active: dev
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+  rabbitmq:
+    host: sf.fantacg.com
+    port: 5672
+    username: guest
+    password: fantacg@1314
+    listener:
+      direct:
+        retry:
+          enabled: true
+      simple:
+        retry:
+          enabled: true
+  servlet:
+    multipart:
+      max-file-size: 2048MB
+      max-request-size: 2048MB
+  redis:
+    host: sf.fantacg.com
+    port: 6379
+    password: fantacg@1314
+    timeout: 60000
+    jedis:
+      pool:
+        maxIdle: 500
+        maxTotal: 2000
+        maxWaitMillis: 2000
+        minEvictableIdleTimeMillis: 300000
+        numTestsPerEvictionRun: 1024
+        timeBetweenEvictionRunsMillis: 30000
+        testOnBorrow: true
+        testWhileIdle: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8079/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 10 #每隔5秒发送一次心跳
+    lease-expiration-duration-in-seconds: 20 # 10秒不发送就过期
+    prefer-ip-address: true #将自己的ip地址注册到Eureka服务中
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}  #指定实例id
+    health-check-url-path: /actuator/health #健康检查的地址（依赖spring-boot-starter-actuator）
+aliyun:
+  idcard:
+    appcode: a1dd6e0872354ca6a45418ceda8fddb4  #阿里云图片身份证识别的套餐appcode
+logging:
+  level:
+    com:
+      fantacg: DEBUG
+  config: classpath:config/logback-spring.xml

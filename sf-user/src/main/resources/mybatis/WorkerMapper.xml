@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.user.mapper.WorkerMapper">
+
+    <!--实人认证上传资料-->
+    <update id="updateWorkerById" parameterType="com.fantacg.common.pojo.user.Worker">
+        UPDATE tb_worker SET
+        worker_name = #{workerName},
+        id_card = #{idCard},
+        real_name_img_front = #{realNameImgFront},
+        real_name_img_back = #{realNameImgBack},
+        real_name_img_person = #{realNameImgPerson},
+        is_auth = #{isAuth}
+        WHERE id = #{id};
+    </update>
+    <!--手机号查询工人信息-->
+    <select id="workerByPhone" parameterType="String" resultType="HashMap">
+        SELECT
+        w.`id`,
+        wi.`name`,
+        wi.`id_card_type`,
+        wi.`id_card_number`,
+        wi.`gender`,
+        wi.`nation`,
+        wi.`edu_level`,
+        wi.`degree`,
+        wi.`worker_type`,
+        wi.`birthday`,
+        wi.`birth_place_code`,
+        wi.`address`,
+        wi.`head_image_url`,
+        wi.`politics_type`,
+        wi.`is_joined`,
+        wi.`joined_time`,
+        wi.`cell_phone`,
+        wi.`culture_level_type`,
+        wi.`specialty`,
+        wi.`has_bad_medical_history`,
+        wi.`urgent_link_man`,
+        wi.`urgent_link_man_phone`,
+        wi.`work_type_code`,
+        wi.`work_corp_name`,
+        wi.`work_date`,
+        wi.`marital_status`,
+        wi.`grant_org`,
+        wi.`positive_id_card_image_url`,
+        wi.`negative_id_card_image_url`,
+        wi.`start_date`
+        FROM tb_worker w
+        LEFT JOIN pb_worker_info wi ON w.id_card = wi.id_card_number
+        WHERE w.phone = #{phone}
+</select>
+</mapper>

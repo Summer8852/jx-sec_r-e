@@ -1,0 +1,18 @@
+file:
+  path: /usr/local/fantacg/nginx/html/file/
+  fileWordPath: /usr/local/fantacg/nginx/html/file/word/
+  ftlPath: /usr/local/fantacg/nginx/html
+  jackson:
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+sf:
+  jwt:
+    pubkeypath: /usr/local/rsa/rsa.pub # 公钥地址
+    cookieName: SF_TOKEN # cookie的名称
+  upload:
+    allowTypes:
+      - image/jpeg
+      - image/png
+      - image/bmp
+    baseUrl: http://sf.fantacg.com

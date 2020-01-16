@@ -1,0 +1,4 @@
+sf:
+  jwt:
+    pubkeypath: C:\\tmp\\rsa\\rsa.pub # 公钥地址
+    cookieName: SF_TOKEN # cookie的名称

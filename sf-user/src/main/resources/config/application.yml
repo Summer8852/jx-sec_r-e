@@ -1,0 +1,117 @@
+server:
+  port: 8082
+spring:
+  profiles:
+    active: dev
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:mysql://sf.fantacg.com:3306/fantacg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: fantacg@1314
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      default-auto-commit: true
+      initial-size: 20
+      max-active: 240
+      max-wait: 10000
+      test-on-borrow: true
+      test-while-idle: true
+      validation-query: SELECT 1
+      validation-query-timeout: 3
+      time-between-eviction-runs-millis: 10000
+      min-evictable-idle-time-millis: 120000
+      remove-abandoned: true
+      remove-abandoned-timeout: 120
+  hikari:
+    auto-commit: true
+    connection-test-query: SELECT 1
+    maximum-pool-size: 150
+    minimum-idle: 10
+    connection-timeout: 60000
+    read-only: false
+    idle-timeout: 60000
+    validation-timeout: 3000
+    max-lifetime: 60000
+    login-timeout: 5
+  redis:
+    host: sf.fantacg.com
+    port: 6379
+    password: fantacg@1314
+    timeout: 60000
+    jedis:
+      pool:
+        maxIdle: 500
+        maxTotal: 2000
+        maxWaitMillis: 2000
+        minEvictableIdleTimeMillis: 300000
+        numTestsPerEvictionRun: 1024
+        timeBetweenEvictionRunsMillis: 30000
+        testOnBorrow: true
+        testWhileIdle: true
+  rabbitmq:
+    host: sf.fantacg.com
+    port: 5672
+    username: guest
+    password: fantacg@1314
+    listener:
+      direct:
+        retry:
+          enabled: true
+      simple:
+        retry:
+          enabled: true
+  mail:
+    host:  smtp.163.com
+    username: fantacg@163.com
+    password: Wenbin123
+    protocol: smtps #协议
+    port: 465 #邮箱服务器端口
+    subject: 深圳九象智慧安全云
+    emailUel: https://sf.fantacg.com/mobile/emailCheck
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  jackson:
+    time-zone: GMT+8
+#注册中心
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8079/eureka
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id:  ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 15
+mybatis:
+  type-aliases-package: com.fantacg.common.pojo
+  mapper-locations: "classpath*:mybatis/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: false
+    return-instance-for-empty-row: false
+  #分布式 雪花算法生成id
+  worker:
+    workerId: 1
+    dataCenterId: 1
+#阿里云图片身份证识别
+aliyun:
+  idcard:
+    appcode: a1dd6e0872354ca6a45418ceda8fddb4  #阿里云图片身份证识别的套餐appcode
+logging:
+  level:
+    com:
+      fantacg: DEBUG
+  config: classpath:config/logback-spring.xml

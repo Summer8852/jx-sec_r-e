@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.ProjectTrainingAnswerMapper">
+    <!--查询工人项目培训的试题-->
+    <select id="queryPTAByPTId" parameterType="java.util.HashMap" resultType="com.fantacg.common.pojo.answer.Answer">
+        SELECT
+            a.answer_id,
+            a.video_id,
+            a.problem,
+            a.A,
+            a.B,
+            a.C,
+            a.D,
+            a.right_key,
+            a.levels,
+            a.mp4_file,
+            a.work_type_id
+        FROM tb_project_training_answer ta
+	    LEFT JOIN tb_answer a ON ta.answer_id = a.answer_id
+        WHERE ta.project_training_id = #{projectTrainingId}
+	    AND ta.training_sys_no = #{trainingSysNo}
+    </select>
+
+    <!--添加培训试题-->
+    <insert id="insertProjectTrainingAnswer" parameterType="java.util.ArrayList">
+        INSERT INTO tb_project_training_answer( `project_training_id`, `training_sys_no`, `answer_id`, `in_user_name`,
+        `in_date`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectTrainingId}, #{item.trainingSysNo}, #{item.answerId}, #{item.inUserName}, #{item.inDate})
+        </foreach>
+    </insert>
+
+</mapper>

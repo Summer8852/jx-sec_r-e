@@ -1,0 +1,11 @@
+docker 备份mysql5.6
+
+docker exec -it mysql mysqldump -uroot -pfantacg@1314 fantacg > /usr/local/fantacg/mysql/backup/fantacg_$(date +%Y_%m_%d_%H_%M_%S).sql
+
+使用crontab -e //编辑
+crontab -l //查看定时任务
+生效运行：
+先安装；
+systemctl enable crond
+systemctl start crond
+systemctl stop crond

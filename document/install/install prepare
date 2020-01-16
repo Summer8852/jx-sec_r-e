@@ -1,0 +1,35 @@
+安装前创建需要的文件
+mkdir /usr/local/rsa /usr/local/fantacg
+mkdir /usr/local/fantacg/java /usr/local/fantacg/redis /usr/local/fantacg/nginx  /usr/local/fantacg/document  /usr/local/fantacg/fastdfs /usr/local/fantacg/mysql
+mkdir /usr/local/fantacg/java/project
+mkdir /usr/local/fantacg/redis/data
+mkdir /usr/local/fantacg/mysql/data  /usr/local/fantacg/mysql/conf
+mkdir /usr/local/fantacg/mysql/conf/conf.d
+mkdir /usr/local/fantacg/fastdfs/etc /usr/local/fantacg/fastdfs/data
+mkdir /usr/local/fantacg/fastdfs/data/storage_data /usr/local/fantacg/fastdfs/data/store_path /usr/local/fantacg/fastdfs/data/tracker_data
+
+开放端口(如开放 不需要重复开放)
+firewall-cmd --zone=public --add-port=3306/tcp --permanent
+firewall-cmd --zone=public --add-port=22122/tcp --permanent
+firewall-cmd --zone=public --add-port=23000/tcp --permanent
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --zone=public --add-port=8888/tcp --permanent
+firewall-cmd --zone=public --add-port=8079/tcp --permanent
+firewall-cmd --zone=public --add-port=2375/tcp --permanent
+firewall-cmd --zone=public --add-port=8079/tcp --permanent
+firewall-cmd --reload
+firewall-cmd --list-ports(查看开放端口)
+
+
+mysql 设置
+SHOW VARIABLES LIKE '%max_connections%';
+SHOW GLOBAL VARIABLES LIKE 'wait_timeout';
+SHOW GLOBAL VARIABLES LIKE 'interactive_timeout';
+SET GLOBAL wait_timeout=30;
+SET GLOBAL interactive_timeout=30;
+SET GLOBAL max_connections=1500;
+
+
+
+

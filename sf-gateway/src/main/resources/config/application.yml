@@ -1,0 +1,82 @@
+server:
+  port: 10088
+  tomcat:
+    max-threads: 2000
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateway
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+      enabled: true
+  rabbitmq:
+    host: sf.fantacg.com
+    port: 5672
+    username: guest
+    password: fantacg@1314
+  jackson:
+    time-zone: GMT+8
+# 添加Eureka配置，获取服务信息
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8079/eureka
+    registry-fetch-interval-seconds: 60   # 获取服务列表的周期：5s
+    enabled: true
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+# 修改映射配置，通过服务名称获取
+zuul:
+  semaphore:
+    max-semaphores: 50000 #设置全部路由最大信号量
+  prefix: /api # 添加路由前缀
+  routes:
+    video-service: /video/** # 将视频微服务映射到 /video/**
+    user-service: /user/** # 用户微服务
+    auth-service: /auth/** # 授权中心微服务
+    project-service: /project/** # 企业项目班主微服务
+    worker-service: /worker/** # 实人信息微服务
+    answer-service: /answer/** # 项目培训微服务
+  ignored-services:
+    - upload-service # 忽略upload-service 上传图片微服务
+  add-host-header: true
+  sensitive-headers: #配置禁止使用的头信息，这里设置为null，否则set-cookie无效
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20000 #线程池数量
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 600000 #发生熔断的超时时间
+          semaphore:
+            maxConcurrentRequests: 3000 #允许的最大请求数,如果达到最大并发数时，后续请求会被拒绝
+      circuitBreaker:
+        sleepWindowInMilliseconds: 500000 # 熔断超时时长 5000ms
+ribbon:
+  OkToRetryOnAllOperations: true #全部请求开启重试机制
+  ConnectTimeout: 600000 # 连接超时时间(ms)
+  ReadTimeout: 600000 # 通信超时时间(ms)
+  MaxTotalHttpConnections: 2000 #最大http连接数
+  MaxConnectionsPerHost: 2000 #每个host最大连接数
+  MaxAutoRetries: 10 #最大重试次数
+  MaxAutoRetriesNextServer: 10 #切换实例的重试次数
+logging:
+  level:
+    com:
+      fantacg: DEBUG
+  config: classpath:config/logback-spring.xml

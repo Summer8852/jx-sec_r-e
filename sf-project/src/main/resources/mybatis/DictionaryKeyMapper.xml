@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.DictionaryKeyMapper">
+    <!--  根据 type 查询字典表  -->
+    <select id="selectDictByType" parameterType="string" resultType="com.fantacg.common.dto.project.DictVO">
+        SELECT
+        sd.id,
+        sd.value,
+        sd.label,
+        sd.description,
+        sd.parent_id
+        FROM
+        pb_dict sd
+        WHERE sd.del_flag = 0
+        AND sd.type = #{type}
+    </select>
+    
+</mapper>

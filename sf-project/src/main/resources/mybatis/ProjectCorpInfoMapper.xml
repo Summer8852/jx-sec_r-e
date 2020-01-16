@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.ProjectCorpInfoMapper">
+
+    <!--添加项目参建单位信息-->
+    <insert id="installProjectCorpInfo" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.fantacg.common.pojo.project.ProjectCorpInfo">
+        INSERT INTO pb_project_corp_info
+        (
+        project_code,
+        corp_id,
+        corp_code,
+        corp_name,
+        corp_type,
+        entry_time,
+        exit_time,
+        pm_name,
+        pm_id_card_type,
+        pm_id_card_number,
+        pm_phone,
+        bank_card_info,
+        in_user_name,
+        in_date
+        )
+        VALUES
+        (
+        #{projectCode},
+        #{corpId},
+        #{corpCode},
+        #{corpName},
+        #{corpType},
+        #{entryTime},
+        #{exitTime},
+        #{pmName},
+        #{pmIdCardType},
+        #{pmIdCardNumber},
+        #{pmPhone},
+        #{bankCardInfo},
+        #{inUserName},
+        #{inDate}
+        )
+
+    </insert>
+
+    <!--  根据参建单位信息id查询  -->
+    <select id="selectProjectCorpInfoByList" parameterType="list" resultType="com.fantacg.common.pojo.project.ProjectCorpInfo">
+        SELECT
+        pci.id,
+        pci.project_code,
+        pci.corp_id,
+        cbi.corp_code,
+        cbi.corp_name,
+        pci.corp_type,
+        pci.entry_time,
+        pci.exit_time,
+        pci.pm_name,
+        pci.pm_id_card_type,
+        pci.pm_id_card_number,
+        pci.pm_phone,
+        pci.bank_card_info,
+        pci.in_user_name,
+        pci.in_date,
+        bci.business_type,
+        bci.business_sys_no,
+        bci.bank_name,
+        bci.bank_number,
+        bci.bank_link_number
+        FROM pb_project_corp_info pci
+        LEFT JOIN pb_corp_basic_info cbi ON pci.corp_id = cbi.id
+        LEFT JOIN pb_bank_card_info bci ON pci.bank_card_info = bci.id
+        WHERE pci.id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

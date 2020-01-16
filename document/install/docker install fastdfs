@@ -1,0 +1,142 @@
+                            第一步 安装fastdfs
+1、下载
+    docker image pull season/fastdfs
+
+2、	获取配置文件
+    docker run -ti --name fdfs_sh --net=host season/fastdfs sh
+    docker ps -a   查询镜像id 例：9b4360e2efc6）
+    docker cp -a 9b4360e2efc6:/fdfs_conf/.  /usr/local/fantacg/fastdfs/etc
+
+3、切换目录
+    cd /usr/local/fantacg/fastdfs/etc/
+
+4、修改配置文件
+    vi tracker.conf
+    添加下面内容 ：(x.x.x.x 为服务器ip)
+    store_path0=/usr/local/fantacg/fastdfs/data/store_path
+    tracker_server=x.x.x.x:22122
+
+
+    修改base_path路径如下
+    base_path= /usr/local/fantacg/fastdfs/data/store_path
+    修改http.server_port 为80
+
+    保存退出
+    vi storage.conf
+    修改 （x.x.x.x为服务器ip） tracker_server=x.x.x.x:22122
+    修改http.server_port 为 80
+    http.server_por=80
+    修改base_path store_path0路径如下
+    base_path=/usr/local/fantacg/fastdfs/data/store_path
+    store_path0= /usr/local/fantacg/fastdfs/data/store_path
+
+    保存退出
+    vi client.conf
+    修改 （x.x.x.x为服务器ip） tracker_server=x.x.x.x:22122
+     修改base_path store_path0路径如下
+    base_path= /usr/local/fantacg/fastdfs/data/store_path
+
+    修改 http.tracker_server_port为80
+
+5、启动容器
+    1.启动tracker
+        docker run -tid --name  tracker -v /usr/local/fantacg/fastdfs/data/tracker_data/data:/fastdfs/tracker/data -v /usr/local/fantacg/fastdfs/etc:/fdfs_conf --privileged=true --net=host  season/fastdfs tracker
+    2.启动storage （x.x.x.x 为服务器ip）
+        docker run -tid --name storage -v /usr/local/fantacg/fastdfs/data/storage_data/data:/fastdfs/storage/data -v /usr/local/fantacg/fastdfs/data/store_path:/fastdfs/store_path -v /usr/local/fantacg/fastdfs/etc:/fdfs_conf --privileged=true --net=host -e TRACKER_SERVER:x.x.x.x:22122 season/fastdfs storage
+
+
+                            第二步 安装相关主键
+1、安装相关命令
+    yum -y install make zlib zlib-devel gcc-c++ libtool  openssl openssl-devel wget git
+2、 下载相关软件
+    切换到下载目录文件夹：cd /usr/local/fantacg/document/
+    1.git clone https://github.com/happyfish100/libfastcommon.git
+    2.git clone https://github.com/happyfish100/fastdfs-nginx-module.git
+    3.git clone https://github.com/happyfish100/fastdfs.git
+
+
+3、 安装libfastcommon
+    cd libfastcommon/
+    ./make.sh
+    ./make.sh install
+4、安装fastdfs
+    Cd ../ fastdfs
+    ./make.sh
+    ./make.sh install
+
+5、拷贝/usr/local/fantacg/fastdfs/etc/目录下的内容到/etc/fdfs目录下。将fastdfs-nginx-module/src 目录下的mod_fastdfs.conf也复制到/etc/fdfs。
+	cd /usr/local/fantacg/fastdfs/etc/
+	cp storage.conf tracker.conf client.conf  mime.types /etc/fdfs/
+    cd /usr/local/fantacg/document/fastdfs-nginx-module/src/
+    cp mod_fastdfs.conf /etc/fdfs/
+    修改 /etc/fdfs/mod_fastdfs.conf：
+    vi  /etc/fdfs/mod_fastdfs.conf
+    修改base_path store_path0路径如下：
+    base_path=/usr/local/fantacg/fastdfs/data/store_path
+
+    store_path0=/usr/local/fantacg/fastdfs/data/store_path
+
+
+    修改tracker_server=x.x.x.x:22122（x.x.x.x 为服务器ip）
+
+    修改url_have_group_name = true //请求路径是否携带组信息
+
+
+                            第三步nginx 安装
+1、首先要安装 PCRE  下载 PCRE 安装包
+    cd /usr/local/fantacg/document
+    wget http://downloads.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz
+
+2、解压安装包:
+    tar zxvf pcre-8.35.tar.gz
+    进入安装包目录
+    cd pcre-8.35
+    编译安装
+    ./configure
+    make && make install
+
+3、查看pcre版本
+ 	pcre-config --version
+
+4、下载 Nginx
+    cd /usr/local/fantacg/document
+    wget http://nginx.org/download/nginx-1.6.2.tar.gz
+5、解压安装包
+    tar zxvf nginx-1.6.2.tar.gz
+    进入安装包目录
+    cd nginx-1.6.2
+6、编译安装
+    ./configure --prefix=/usr/local/fantacg/nginx/ --add-module=/usr/local/fantacg/document/fastdfs-nginx-module/src/  --with-http_stub_status_module --with-http_ssl_module --with-pcre=/usr/local/fantacg/document/pcre-8.35
+    make
+    make install
+    查看nginx版本
+    /usr/local/fantacg/nginx/sbin/nginx -v
+
+7、nginx配置
+    vi /usr/local/fantacg/nginx/conf/nginx.conf
+
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $host;
+    client_max_body_size 5000M;
+
+    # 上传路径的映射
+    location /api/upload {
+            proxy_pass http://127.0.0.1:8085;
+            proxy_connect_timeout 600;
+            proxy_read_timeout 600;
+
+            rewrite "^/api/(.*)$" /$1 break;
+          }
+
+    location /api {
+            proxy_pass http://127.0.0.1:10010;
+            proxy_connect_timeout 600;
+            proxy_read_timeout 600;
+          }
+    location ~/group([0-9])/M00 {
+        # root /var/fdfs/storage_path;
+            ngx_fastdfs_module;
+      }
+

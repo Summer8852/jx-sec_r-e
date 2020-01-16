@@ -1,0 +1,94 @@
+server:
+  port: 8086
+spring:
+  profiles:
+    active: dev
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+  application:
+    name: video-service
+  datasource:
+    url: jdbc:mysql://sf.fantacg.com:3306/fantacg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: fantacg@1314
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      default-auto-commit: true
+      initial-size: 20
+      max-active: 240
+      max-wait: 10000
+      test-on-borrow: true
+      test-while-idle: true
+      validation-query: SELECT 1
+      validation-query-timeout: 3
+      time-between-eviction-runs-millis: 10000
+      min-evictable-idle-time-millis: 120000
+      remove-abandoned: true
+      remove-abandoned-timeout: 120
+    hikari:
+      auto-commit: true
+      connection-test-query: SELECT 1
+      maximum-pool-size: 150
+      minimum-idle: 10
+      connection-timeout: 60000
+      read-only: false
+      idle-timeout: 60000
+      validation-timeout: 3000
+      max-lifetime: 60000
+      login-timeout: 5
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+      enabled: true
+  redis:
+    host: sf.fantacg.com # Redis服务器地址
+    port: 6379 # Redis服务器连接端口
+    password: fantacg@1314
+    timeout: 60000 # redis连接超时时间（单位毫秒）
+    jedis:
+      pool:
+        max-active: -1 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: -1 # 连接池中的最大空闲连接
+        min-idle: -1 # 连接池中的最小空闲连接
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq:
+    host: sf.fantacg.com
+    port: 5672
+    username: guest
+    password: fantacg@1314
+    listener:
+      direct:
+        retry:
+          enabled: true
+      simple:
+        retry:
+          enabled: true
+  jackson:
+    time-zone: GMT+8
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8079/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 5 # 每隔5秒发送一次心跳
+    lease-expiration-duration-in-seconds: 10 # 10秒不发送就过期
+    prefer-ip-address: true #将自己的ip地址注册到Eureka服务中
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}  #指定实例id
+mybatis:
+  type-aliases-package: com.fantacg.common.pojo.video
+  mapper-locations: "classpath*:mybatis/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com:
+      fantacg: DEBUG
+  config: classpath:config/logback-spring.xml

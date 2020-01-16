@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.PersonBadCreditInfoMapper">
+
+    <!-- 分页查询不良行为记录 -->
+    <select id="queryPersonBadCreditByPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.project.PersonBadCreditInfo">
+        SELECT
+        `id`,
+        `person_name`,
+        `id_card_type`,
+        `id_card_number`,
+        `corp_code`,
+        `corp_name`,
+        `create_dep_name`,
+        `create_user_name`,
+        `create_date`,
+        `credit_type`,
+        `credit_code`,
+        `content`,
+        `happen_date`,
+        `region_no`,
+        `project_code`,
+        `depart_name`,
+        `depart_type_id`,
+        `punish_evidence`,
+        `mark`,
+        `file_num`,
+        `punish_date`,
+        `punish_e_date`,
+        `in_date`
+        FROM pb_person_bad_credit_info
+        WHERE is_del = 0
+        AND in_user_name= #{memberId}
+        <if test="name !=null and name !=''">
+            AND person_name= #{name}
+        </if>
+        ORDER BY in_date DESC
+    </select>
+
+</mapper>

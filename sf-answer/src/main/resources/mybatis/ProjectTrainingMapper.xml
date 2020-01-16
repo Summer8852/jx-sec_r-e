@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.ProjectTrainingMapper">
+
+    <!--分页查询项目列表-->
+    <select id="selectAllProjectTrainingByPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.answer.ProjectTraining">
+        SELECT
+        pt.id,
+        pt.sys_no,
+        pi.name project_code,
+        pt.training_date,
+        pt.training_duration,
+        pt.training_name,
+        pt.training_type_code,
+        pt.trainer,
+        cbi.corp_name training_org,
+        pt.training_address,
+        pt.description,
+        pt.training_status,
+        pt.file_attachment_info
+        FROM
+        pb_project_training pt
+        LEFT JOIN pb_corp_basic_info cbi ON pt.training_org = cbi.id
+        LEFT JOIN pb_project_info pi ON pt.project_code = pi.code
+        WHERE pt.training_status != -1
+        and pt.in_user_name = #{memberId}
+        <if test="searchProjectCode != null and searchProjectCode != ''">
+            and pt.project_code = #{searchProjectCode}
+        </if>
+        <if test="searchTrainingDate != null and searchTrainingDate != ''">
+            and pt.training_date = #{searchTrainingDate}
+        </if>
+        <if test="searchTrainingName != null and searchTrainingName != ''">
+            and pt.training_name = #{searchTrainingName}
+        </if>
+        <if test="searchTypeCode != null and searchTypeCode != ''">
+            and pt.training_type_code = #{searchTypeCode}
+        </if>
+        <if test="trainingStatus != null">
+            and pt.training_status = #{trainingStatus}
+        </if>
+        order by pt.in_date DESC
+    </select>
+
+    <!-- 查询当前用户项目编号的最大值 -->
+    <select id="getSysNo" resultType="long">
+        SELECT MAX(sys_no) sys_no FROM pb_project_training WHERE to_days(in_date) = to_days(now()) AND in_user_name = #{memberId,jdbcType=BIGINT}
+    </select>
+
+    <!--  工人查询项目培训列表  -->
+    <select id="queryWorkerTrainings" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.vo.answer.ProjectTrainingVO">
+        SELECT
+        pt.id,
+        pt.sys_no,
+        pt.training_name,
+        pt.training_type_code type_name,
+        pt.training_date,
+        ptm.training_date training_answer_date
+        FROM  tb_project_training_member ptm
+        LEFT JOIN pb_project_training pt ON ptm.project_training_id = pt.id
+        WHERE pt.training_status != -1
+        AND ptm.id_card_number = #{cardNum}
+        AND ptm.is_training = #{isTraining}
+        AND pt.training_status = #{trainingStatus}
+        ORDER BY pt.training_date DESC
+    </select>
+
+    <!--  查询培训历史记录  -->
+    <select id="queryWorkerTrainingDetailByCardNum" parameterType="com.fantacg.common.dto.answer.PtDto"
+            resultType="com.fantacg.common.vo.answer.ProjectTrainingVO">
+        SELECT
+        pt.id,
+        pt.sys_no,
+        pt.training_name,
+        pt.training_type_code type_name,
+        pt.training_date,
+        ptd.in_date training_answer_date
+        FROM  pb_project_training_detail ptd
+        LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+        WHERE ptd.id_card_number = #{idCardNumber}
+        ORDER BY pt.in_date DESC
+    </select>
+
+    <!--  查询培训答题详情  -->
+    <select id="queryProjectTrainingAnswerDetail" parameterType="com.fantacg.common.dto.answer.PtDto"
+            resultType="java.util.HashMap">
+        SELECT
+            pt.training_name,
+            pt.training_duration,
+            pt.training_date,
+            ptd.score,
+            ptd.is_pass,
+            al.project_training_id,
+            al.training_sys_no,
+            al.exactness_answer
+        FROM
+            pb_project_training_detail ptd
+	    LEFT JOIN pb_project_training pt ON ptd.project_training_id = pt.id
+	    LEFT JOIN tb_answer_log al ON al.project_training_id = ptd.project_training_id
+        WHERE ptd.id_card_number = #{idCardNumber}
+        AND ptd.project_training_id = #{projectTrainingId}
+        AND ptd.training_sys_no = #{trainingSysNo}
+        GROUP BY ptd.project_training_id
+    </select>
+
+    <!-- 单个删除培训项目 -->
+    <update id="deleteProjectTraining" parameterType="com.fantacg.common.dto.answer.ProjectTrainingDto">
+        UPDATE fantacg.pb_project_training
+        SET training_status = -1,
+            del_date = NOW(),
+            edit_user_name = #{memberId,jdbcType=BIGINT},
+            edit_date = NOW()
+        WHERE in_user_name = #{memberId,jdbcType=BIGINT}
+        AND id = #{id,jdbcType=VARCHAR}
+        AND sys_no = #{sysNo,jdbcType=VARCHAR}
+    </update>
+
+    <!--  结束项目培训考试  -->
+    <update id="stopProjectTraining" parameterType="com.fantacg.common.dto.answer.ProjectTrainingDto">
+        UPDATE pb_project_training pt
+        SET pt.training_status = #{trainingStatus,jdbcType=INTEGER}
+        WHERE in_user_name = #{memberId,jdbcType=BIGINT}
+        AND pt.id = #{id,jdbcType=VARCHAR}
+	    AND pt.sys_no = #{sysNo,jdbcType=VARCHAR}
+    </update>
+
+    <!--  提前开始项目培训培训  -->
+    <update id="startProjectTraining" parameterType="com.fantacg.common.dto.answer.ProjectTrainingDto">
+        UPDATE fantacg.pb_project_training
+        SET training_date = NOW(), training_status = 1
+        WHERE id = #{id,jdbcType=VARCHAR}
+        AND sys_no = #{sysNo,jdbcType=VARCHAR}
+        AND in_user_name = #{memberId,jdbcType=BIGINT}
+    </update>
+
+    <!--  自动结束培训考试 -->
+    <update id="voluntaryStopProjectTraining" parameterType="java.lang.String">
+        UPDATE pb_project_training SET training_status = 2 where training_date &lt; #{trainingDate} and training_status = 1
+    </update>
+
+    <!--查询 小于 当前时间+ 30天 时间 已删除的培训 -->
+    <select id="selectDelProjectTrainingByDelDate" parameterType="java.lang.String"
+            resultType="com.fantacg.common.dto.answer.ProjectTrainingDto">
+        SELECT id,sys_no FROM pb_project_training where del_date &lt; #{delDate} and training_status = -1
+    </select>
+</mapper>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.FileAttachmentInfoMapper">
+
+    <!--  添加我的企业  -->
+    <select id="selectFileAttachmentInfoByBusinessSysNo" parameterType="string" resultType="com.fantacg.common.pojo.project.FileAttachmentInfo">
+        SELECT f.id, f.business_type, f.business_sys_no, f.`name`, f.url
+        FROM pb_file_attachment_info f
+        WHERE business_sys_no = #{businessSysNo}
+    </select>
+
+</mapper>

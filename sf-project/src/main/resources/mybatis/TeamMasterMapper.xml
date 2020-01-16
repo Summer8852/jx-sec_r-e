@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.TeamMasterMapper">
+
+    <!--添加项目参建单位信息-->
+    <insert id="installTeamMasters" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.fantacg.common.pojo.project.TeamMaster">
+        insert into pb_team_master
+        (id,
+        team_sys_no,
+        project_code,
+        corp_code,
+        corp_name,
+        team_name,
+        team_leader_name,
+        team_leader_phone,
+        team_leader_id_card_type,
+        team_leader_id_number,
+        responsible_person_name,
+        responsible_person_phone,
+        responsible_person_id_card_type,
+        responsible_person_id_number,
+        remark,
+        entry_time,
+        exit_time ,
+        in_user_name,
+        in_date
+        )
+        VALUES
+        (
+        #{id},
+        #{teamSysNo},
+        #{projectCode},
+        #{corpCode},
+        #{corpName},
+        #{teamName},
+        #{teamLeaderName},
+        #{teamLeaderPhone},
+        #{teamLeaderIdCardType},
+        #{teamLeaderIdNumber},
+        #{responsiblePersonName},
+        #{responsiblePersonPhone},
+        #{responsiblePersonIdCardType},
+        #{responsiblePersonIdNumber},
+        #{remark},
+        #{entryTime},
+        #{exitTime},
+        #{inUserName},
+        #{inDate}
+        )
+    </insert>
+
+    <!--  根据班组id 查询详情  -->
+    <select id="selectTeamMasterById" parameterType="string" resultType="com.fantacg.common.pojo.project.TeamMaster">
+       SELECT
+            tm.id,
+            tm.team_sys_no,
+            ppi.`name` project_name,
+            tm.project_code,
+            ptc.corp_basic_id corp_id,
+            tm.corp_code,
+            tm.corp_name,
+            tm.team_name,
+            tm.team_leader_name,
+            tm.team_leader_phone,
+            tm.team_leader_id_card_type,
+            tm.team_leader_id_number,
+            tm.responsible_person_name,
+            tm.responsible_person_phone,
+            tm.responsible_person_id_card_type,
+            tm.responsible_person_id_number,
+            tm.remark,
+            tm.entry_time,
+            tm.exit_time,
+            tm.entry_file_attachment_info,
+            tm.exit_file_attachment_info,
+            a.label team_leader_id_card_name,
+            b.label responsible_person_id_card_name
+        FROM
+            pb_project_tm_corp ptc
+            LEFT JOIN pb_team_master tm ON ptc.tram_master_id = tm.id
+            LEFT JOIN pb_project_info ppi ON ptc.project_id = ppi.id
+            LEFT JOIN ( SELECT label, `value` FROM pb_dictionary WHERE type = 'IDCARDTYPEDIC' ) a ON tm.team_leader_id_card_type = a.`value`
+            LEFT JOIN ( SELECT label, `value` FROM pb_dictionary WHERE type = 'IDCARDTYPEDIC' ) b ON tm.responsible_person_id_card_type =  b.`value`
+        WHERE  tm.is_del = 0 AND  tm.id = #{id};
+    </select>
+
+    <!--  查询最大的班组编号  -->
+    <select id="selectTeamSysNoMax" resultType="string">
+        SELECT MAX(team_sys_no) max FROM pb_team_master;
+    </select>
+
+    <!--  分页查询班组列表  -->
+    <select id="selectTeamMasterByPage" parameterType="java.util.HashMap" resultType="com.fantacg.common.pojo.project.TeamMaster">
+        SELECT
+            tm.id,
+            tm.team_sys_no,
+            ppi.`name` project_name,
+            tm.project_code,
+            ptc.corp_basic_id corp_id,
+            tm.corp_code,
+            tm.corp_name,
+            tm.team_name,
+            tm.team_leader_name,
+            tm.team_leader_phone,
+            tm.team_leader_id_card_type,
+            tm.team_leader_id_number,
+            tm.responsible_person_name,
+            tm.responsible_person_phone,
+            tm.responsible_person_id_card_type,
+            tm.responsible_person_id_number,
+            tm.remark,
+            tm.entry_time,
+            tm.exit_time,
+            tm.entry_file_attachment_info,
+            tm.exit_file_attachment_info
+        FROM
+            pb_project_tm_corp ptc
+            LEFT JOIN pb_team_master tm ON ptc.tram_master_id = tm.id
+            LEFT JOIN pb_project_info ppi ON ptc.project_id = ppi.id
+        WHERE tm.is_del = 0
+        AND  tm.in_user_name= #{memberId}
+        <if test="projectCode !=null and projectCode !=''">
+            AND  tm.project_code= #{projectCode}
+        </if>
+        <if test="name !=null and name !=''">
+            AND  tm.team_name like #{name}
+        </if>
+        ORDER BY tm.in_date DESC
+    </select>
+
+    <!--  根据id 查询  -->
+    <select id="selectTeamMasterByList" parameterType="list" resultType="com.fantacg.common.pojo.project.TeamMaster">
+        SELECT
+        tm.id,
+        tm.team_sys_no,
+        tm.project_code,
+        ptc.corp_basic_id corp_id,
+        tm.corp_code,
+        tm.corp_name,
+        tm.team_name,
+        tm.team_leader_name,
+        tm.team_leader_phone,
+        tm.team_leader_id_card_type,
+        tm.team_leader_id_number,
+        tm.responsible_person_name,
+        tm.responsible_person_phone,
+        tm.responsible_person_id_card_type,
+        tm.responsible_person_id_number,
+        tm.remark,
+        tm.entry_time,
+        tm.exit_time,
+        tm.entry_file_attachment_info,
+        tm.exit_file_attachment_info,
+        a.label team_leader_id_card_name,
+        b.label responsible_person_id_card_name
+        FROM pb_project_tm_corp ptc
+        LEFT JOIN pb_team_master tm ON ptc.tram_master_id = tm.id
+        LEFT JOIN pb_project_info ppi ON ptc.project_id = ppi.id
+        LEFT JOIN ( SELECT d.`value`,d.label FROM pb_dictionary pd  LEFT JOIN pb_dictionary d ON pd.id = d.parent_id WHERE pd.type = 'IDCARDTYPEDIC' ) a ON
+        tm.team_leader_id_card_type = a.`value`
+        LEFT JOIN ( SELECT d.`value`,d.label FROM pb_dictionary pd  LEFT JOIN pb_dictionary d ON pd.id = d.parent_id WHERE pd.type = 'IDCARDTYPEDIC' ) b ON
+        tm.responsible_person_id_card_type = b.`value`
+        WHERE tm.is_del = 0
+        AND tm.id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 删除班组 -->
+    <update id="updateTeamMasterIsDel" parameterType="java.util.HashMap">
+        UPDATE pb_team_master SET
+        edit_user_name = #{memberId},
+        edit_date = #{editDate},
+        is_del = 1
+        WHERE is_del = 0
+        AND id = #{id}
+        AND in_user_name = #{memberId}
+    </update>
+
+    <!-- 根据项目编号查询班组信息 -->
+    <select id="selectTeamMasterByProjectId" resultType="com.fantacg.common.pojo.project.TeamMaster">
+        SELECT
+            tm.id,
+            tm.team_sys_no,
+            tm.project_code,
+            ptc.corp_basic_id corp_id,
+            cbi.corp_code,
+            cbi.corp_name,
+            tm.team_name,
+            tm.team_leader_name,
+            tm.team_leader_phone,
+            tm.team_leader_id_card_type,
+            tm.team_leader_id_number,
+            tm.responsible_person_name,
+            tm.responsible_person_phone,
+            tm.responsible_person_id_card_type,
+            tm.responsible_person_id_number,
+            tm.remark,
+            tm.entry_time,
+            tm.exit_time,
+            tm.entry_file_attachment_info,
+            tm.exit_file_attachment_info
+        FROM
+            pb_project_tm_corp ptc
+        LEFT JOIN pb_corp_basic_info cbi ON ptc.corp_basic_id = cbi.id
+        LEFT JOIN pb_team_master tm ON ptc.tram_master_id = tm.id
+        WHERE ptc.project_id = #{projectId} and tm.in_user_name = #{memberId}
+    </select>
+
+    <!--  查询班组名称是否重复  -->
+    <select id="selectByName" resultType="string">
+        SELECT id count FROM pb_team_master WHERE is_del = 0 AND in_user_name = #{memberId} AND team_name =#{teamName}
+    </select>
+</mapper>

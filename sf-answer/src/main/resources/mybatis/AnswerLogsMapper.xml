@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.answer.mapper.AnswerLogMapper">
+
+    <!--  批量添加答题记录  -->
+    <insert id="insertanswerLogs" parameterType="java.util.List">
+        INSERT INTO tb_answer_log(id,project_training_id,training_sys_no,id_card_number,exactness_answer,in_date)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.projectTrainingId}, #{item.trainingSysNo},
+            #{item.idCardNumber},#{item.exactnessAnswer} , #{item.inDate})
+        </foreach>
+    </insert>
+
+</mapper>

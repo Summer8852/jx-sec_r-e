@@ -1,0 +1,8 @@
+sf:
+  jwt:
+    secret: jx@Login(Auth}*^31)&fantacg% # 登录校验的密钥
+    pubkeypath: C:\\tmp\\rsa\\rsa.pub # 公钥地址
+    priKeyPath: C:\\tmp\\rsa\\rsa.pri # 私钥地址
+    cookieName: SF_TOKEN # cookie的名称
+    expire: 1440 # 服务器token过期时间,单位分钟
+    cookieMaxAge: -1 #86400 #浏览器token过期时间,单位秒  -1表示只要关闭浏览器，此cookie就会消失

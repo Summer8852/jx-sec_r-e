@@ -1,0 +1,19 @@
+file:
+  path: E:\file\
+  fileWordPath: E:\file\word\
+  ftlPath: E:\file\
+  jackson:
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+sf:
+  jwt:
+    pubkeypath: C:\\tmp\\rsa\\rsa.pub # 公钥地址
+    cookieName: SF_TOKEN # cookie的名称
+  upload:
+    allowTypes:
+      - image/jpeg
+      - image/png
+      - image/bmp
+    baseUrl: http://sf.fantacg.com
+    https: https://sf.fantacg.com

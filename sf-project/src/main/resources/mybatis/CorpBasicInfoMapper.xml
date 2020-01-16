@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.project.mapper.CorpBasicInfoMapper">
+
+    <!--  添加我的企业  -->
+    <insert id="installCorpBasicInfo" parameterType="com.fantacg.common.pojo.project.CorpBasicInfo"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO pb_corp_basic_info
+        (id,corp_code,corp_name,corp_type,license_num,area_code,address,zip_code,legal_man,legal_man_duty,legal_man_pro_title,legal_man_id_card_type,legal_man_id_card_number,reg_capital,fact_reg_capital,capital_currency_type,register_date,establish_date,office_phone,fax_number,link_man,link_phone,email,web_site,in_user_name,in_date)
+        VALUES
+	    (#{id},#{corpCode},#{corpName},#{corpType},#{licenseNum},#{areaCode},#{address},#{zipCode},#{legalMan},#{legalManDuty},#{legalManProTitle},#{legalManIdCardType},#{legalManIdCardNumber},#{regCapital},#{factRegCapital},#{capitalCurrencyType},#{registerDate},#{establishDate},#{officePhone},#{faxNumber},#{linkMan},#{linkPhone},#{email},#{webSite},#{inUserName},#{inDate});
+    </insert>
+
+    <!--  查询code是否重复  -->
+    <select id="selectCorpBasicInfoCode" resultType="string">
+        SELECT cbi.id FROM pb_corp_basic_info cbi
+        WHERE cbi.is_del = 0
+        AND cbi.in_user_name = #{memberId}
+        AND cbi.corp_code = #{corpCode}
+    </select>
+
+    <!--  查询namn是否重复  -->
+    <select id="selectCorpBasicInfoName" resultType="string">
+        SELECT cbi.id FROM pb_corp_basic_info cbi
+        WHERE cbi.is_del = 0
+        AND cbi.in_user_name = #{memberId}
+        AND cbi.corp_name = #{corpName}
+    </select>
+
+    <!--分页查询我的企业-->
+    <select id="queryCorpBasicInfoListPage" parameterType="java.util.HashMap"
+            resultType="com.fantacg.common.pojo.project.CorpBasicInfo">
+        SELECT
+        cbi.id,
+        cbi.corp_code,
+        cbi.corp_name,
+        cbi.corp_type,
+        cbi.license_num,
+        cbi.area_code,
+        cbi.address,
+        cbi.zip_code,
+        cbi.legal_man ,
+        cbi.legal_man_duty,
+        cbi.legal_man_pro_title,
+        cbi.legal_man_id_card_type,
+        cbi.legal_man_id_card_number,
+        cbi.reg_capital,
+        cbi.fact_reg_capital,
+        cbi.capital_currency_type,
+        cbi.register_date,
+        cbi.establish_date,
+        cbi.office_phone,
+        cbi.fax_number,
+        cbi.link_man,
+        cbi.link_phone,
+        cbi.email,
+        cbi.web_site
+        FROM pb_corp_basic_info cbi
+        WHERE cbi.`is_del` = 0
+        AND cbi.in_user_name = #{memberId}
+        <if test="corpName != null and corpName != ''">
+            and cbi.`corp_name` like #{corpName}
+        </if>
+        <if test="corpType != null and corpType != ''">
+            and cbi.`corp_type` = #{corpType}
+        </if>
+        order by cbi.in_date DESC
+    </select>
+
+    <!--查询所有的企业代码和名称-->
+    <select id="queryCorpBasicInfoCorpName" parameterType="java.util.HashMap" resultType="map">
+        SELECT
+        cbi.id,
+        cbi.corp_code,
+        cbi.corp_name,
+        cbi.corp_type,
+        cbi.license_num,
+        cbi.area_code,
+        cbi.address,
+        cbi.zip_code,
+        cbi.legal_man,
+        cbi.legal_man_duty,
+        cbi.legal_man_pro_title,
+        cbi.legal_man_id_card_type,
+        cbi.legal_man_id_card_number,
+        cbi.reg_capital,
+        cbi.fact_reg_capital,
+        cbi.capital_currency_type,
+        cbi.register_date,
+        cbi.establish_date,
+        cbi.office_phone,
+        cbi.fax_number,
+        cbi.link_man,
+        cbi.link_phone,
+        cbi.email,
+        cbi.web_site
+        FROM pb_corp_basic_info cbi WHERE cbi.is_del = 0
+        <if test="corpName != null and corpName != '' ">
+            AND cbi.corp_name like #{corpName}
+        </if>
+    </select>
+
+    <!--企业id查询详情-->
+    <select id="queryCorpBasicInfoById" parameterType="Long" resultType="com.fantacg.common.pojo.project.CorpBasicInfo">
+        SELECT
+        cbi.id,
+        cbi.corp_code,
+        cbi.corp_name,
+        cbi.corp_type,
+        cbi.license_num,
+        cbi.area_code,
+        cbi.address,
+        cbi.zip_code,
+        cbi.legal_man,
+        cbi.legal_man_duty,
+        cbi.legal_man_pro_title,
+        cbi.legal_man_id_card_type,
+        cbi.legal_man_id_card_number,
+        cbi.reg_capital,
+        cbi.fact_reg_capital,
+        cbi.capital_currency_type,
+        cbi.register_date,
+        cbi.establish_date,
+        cbi.office_phone,
+        cbi.fax_number,
+        cbi.link_man,
+        cbi.link_phone,
+        cbi.email,
+        cbi.web_site
+        FROM
+	    pb_corp_basic_info cbi
+        WHERE cbi.is_del = 0 AND cbi.id = #{id} AND cbi.in_user_name = #{memberId}
+    </select>
+
+    <!--  修改我的企业基本信息  -->
+    <update id="updateCorpBasicInfo" parameterType="com.fantacg.common.pojo.project.CorpBasicInfo">
+        update pb_corp_basic_info set
+        <if test="corpCode != null and corpCode != '' ">
+            corp_code = #{corpCode},
+        </if>
+        <if test="corpName != null and corpName != '' ">
+            corp_name = #{corpName},
+        </if>
+        <if test="corpType != null and corpType != '' ">
+            corp_type = #{corpType},
+        </if>
+        <if test="licenseNum != null and licenseNum != '' ">
+            license_num = #{licenseNum},
+        </if>
+        <if test="areaCode != null and areaCode != '' ">
+            area_code = #{areaCode},
+        </if>
+        <if test="address != null and address != '' ">
+            address = #{address},
+        </if>
+        <if test="zipCode != null and zipCode != '' ">
+            zip_code = #{zipCode},
+        </if>
+        <if test="legalMan != null and legalMan != '' ">
+            legal_man = #{legalMan},
+        </if>
+        <if test="legalManDuty != null and legalManDuty != '' ">
+            legal_man_duty = #{legalManDuty},
+        </if>
+        <if test="legalManProTitle != null and legalManProTitle != '' ">
+            legal_man_pro_title = #{legalManProTitle},
+        </if>
+        <if test="legalManIdCardType != null and legalManIdCardType != '' ">
+            legal_man_id_card_type = #{legalManIdCardType},
+        </if>
+        <if test="legalManIdCardNumber != null and legalManIdCardNumber != '' ">
+            legal_man_id_card_number = #{legalManIdCardNumber},
+        </if>
+        <if test="regCapital != null and regCapital != '' ">
+            reg_capital = #{regCapital},
+        </if>
+        <if test="factRegCapital != null and factRegCapital != '' ">
+            fact_reg_capital = #{factRegCapital},
+        </if>
+        <if test="capitalCurrencyType != null and capitalCurrencyType != '' ">
+            capital_currency_type = #{capitalCurrencyType},
+        </if>
+        <if test="registerDate != null ">
+            register_date = #{registerDate},
+        </if>
+        <if test="establishDate != null ">
+            establish_date = #{establishDate},
+        </if>
+        <if test="officePhone != null and officePhone != '' ">
+            office_phone = #{officePhone},
+        </if>
+        <if test="faxNumber != null and faxNumber != '' ">
+            fax_number = #{faxNumber},
+        </if>
+        <if test="linkMan != null and linkMan != '' ">
+            link_man = #{linkMan},
+        </if>
+        <if test="linkPhone != null and linkPhone != '' ">
+            link_phone = #{linkPhone},
+        </if>
+        <if test="email != null and email != '' ">
+            email = #{email},
+        </if>
+        <if test="webSite != null and webSite != '' ">
+            web_site = #{webSite},
+        </if>
+        edit_user_name = #{editUserName},
+        edit_date = #{editDate}
+        WHERE is_del = 0
+        AND id = #{id}
+        AND in_user_name = #{inUserName}
+    </update>
+
+    <!--  修改我的企业 -->
+    <update id="updateCorpBasicInfoByCode" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.fantacg.common.pojo.project.CorpBasicInfo">
+        UPDATE pb_corp_basic_info SET
+        <if test="corpName != null and corpName != '' ">
+            corp_name = #{corpName},
+        </if>
+        edit_user_name = #{editUserName},
+        edit_date = #{editDate}
+        WHERE is_del = 0 AND corp_code = #{corpCode}
+        AND in_user_name = #{inUserName}
+    </update>
+
+    <!-- 模糊查询我的企业  -->
+    <select id="searchCorpBasicInfo" parameterType="java.util.HashMap" resultType="HashMap">
+        SELECT cbi.id, cbi.corp_code, cbi.corp_name
+        FROM pb_corp_basic_info cbi
+        WHERE is_del = 0
+        AND cbi.in_user_name = #{memberId}
+        <if test="corpName != null and corpName != ''">
+            AND cbi.corp_name LIKE CONCAT('%', #{corpName}, '%')
+        </if>
+    </select>
+
+    <!-- 根据企业id查询资质信息  -->
+    <select id="queryCorpCertInfoById" parameterType="Long" resultType="com.fantacg.common.pojo.project.CorpCertInfo">
+        SELECT
+        cci.id,
+        cci.corp_code,
+        cci.corp_name,
+        cci.cert_type_num,
+        cci.cert_id,
+        cci.trade_bound_num,
+        cci.trade_type_bound_child_mark,
+        cci.title_level_num,
+        cci.mark,
+        cci.limit_content,
+        cci.note_number,
+        cci.note_date,
+        cci.add_type_num,
+        cci.cert_trade_status_num,
+        cci.cert_trade_modify_date,
+        cci.cert_trade_modify_mark
+        FROM
+        pb_corp_cert_info cci
+        WHERE cci.id = #{id}
+    </select>
+
+</mapper>

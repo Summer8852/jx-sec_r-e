@@ -1,0 +1,81 @@
+server:
+  port: 8081
+  tomcat:
+    max-threads: 2000
+spring:
+  profiles:
+    active: dev
+  application:
+    name: auth-service
+  security:
+    basic:
+      enabled: false
+    user:
+      name: fantacg
+      password: fantacg!1314
+  redis:
+    host: sf.fantacg.com
+    port: 6379
+    password: fantacg@1314
+    timeout: 60000
+    jedis:
+      pool:
+        maxIdle: 500
+        maxTotal: 2000
+        maxWaitMillis: 2000
+        minEvictableIdleTimeMillis: 300000
+        numTestsPerEvictionRun: 1024
+        timeBetweenEvictionRunsMillis: 30000
+        testOnBorrow: true
+        testWhileIdle: true
+  rabbitmq:
+    host: sf.fantacg.com
+    port: 5672
+    username: guest
+    password: fantacg@1314
+  jackson:
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true #当遇到相同的名字时 是否允许覆盖注册
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8079/eureka
+    registry-fetch-interval-seconds: 10
+  instance:
+    lease-renewal-interval-in-seconds: 10 # 每隔5秒发送一次心跳
+    lease-expiration-duration-in-seconds: 20 # 10秒不发送就过期
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+hystrix:
+  threadpool:
+    default:
+      coreSize: 20000 #线程池数量
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 600000 #发生熔断的超时时间
+          semaphore:
+            maxConcurrentRequests: 3000 #允许的最大请求数,如果达到最大并发数时，后续请求会被拒绝
+      circuitBreaker:
+        sleepWindowInMilliseconds: 500000 # 熔断超时时长 5000ms
+ribbon:
+  OkToRetryOnAllOperations: true #全部请求开启重试机制
+  ConnectTimeout: 600000 # 连接超时时间(ms)
+  ReadTimeout: 600000 # 通信超时时间(ms)
+  MaxTotalHttpConnections: 2000 #最大http连接数
+  MaxConnectionsPerHost: 2000 #每个host最大连接数
+  MaxAutoRetries: 10 #最大重试次数
+  MaxAutoRetriesNextServer: 10 #切换实例的重试次数
+feign:
+  hystrix:
+    enabled: false
+logging:
+  level:
+    com:
+      fantacg: DEBUG
+  config: classpath:config/logback-spring.xml

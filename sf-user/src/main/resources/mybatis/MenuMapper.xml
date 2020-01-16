@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fantacg.user.mapper.MenuMapper">
+    <!-- 查询普通管理员的所有菜单ID -->
+    <select id="queryUserMenuId" resultType="Long" parameterType="Long">
+		select distinct srm.menu_id from tb_user_role sur
+			LEFT JOIN tb_role_menu srm on sur.role_id = srm.role_id
+		where sur.user_id = #{userId}
+	</select>
+
+    <!-- 查询用户的所有菜单ID -->
+    <select id="queryMemberMenuId" resultType="Long" parameterType="Long">
+		select distinct srm.menu_id from tb_member_role mr
+			LEFT JOIN tb_role_menu srm on mr.role_id = srm.role_id
+		where mr.member_id = #{memberId}
+	</select>
+
+    <!-- 查询超级管理员菜单id -->
+    <select id="queryAllMenuId" resultType="Long">
+		select  sm.id from tb_menu sm
+	</select>
+
+    <select id="queryListParentId" resultType="com.fantacg.common.pojo.user.Menu">
+		select sm.id,
+            sm.parent_id parentId,
+            sm.title,
+            sm.perms,
+            sm.type,
+            sm.icon,
+            sm.order_num orderNum,
+            sm.path
+        from tb_menu sm where sm.parent_id = #{parentId} order by sm.order_num asc
+	</select>
+
+
+    <select id="queryPermsByMemberId" parameterType="java.util.HashMap" resultType="com.fantacg.common.pojo.user.Menu">
+        SELECT DISTINCT
+        sm.id,
+        sm.parent_id parentId,
+        sm.title,
+        sm.perms,
+        sm.type,
+        sm.icon,
+        sm.order_num orderNum,
+        sm.path
+        FROM
+        tb_menu sm
+        LEFT JOIN tb_role_menu srm ON sm.id = srm.menu_id
+        LEFT JOIN tb_role sr ON srm.role_id = sr.id
+        LEFT JOIN tb_member_role mr ON mr.role_id = sr.id
+        LEFT JOIN tb_member_info mi ON mi.id = mr.member_id
+        WHERE 1=1
+        <if test='id != null and id != ""'>
+            and mi.id = #{id}
+        </if>
+        and sm.parent_id=#{parentId}
+        <if test='type != null and type != ""'>
+            and sm.type=#{type}
+        </if>
+    </select>
+
+    <select id="queryPermsByRoleId" resultType="com.fantacg.common.pojo.user.Menu" parameterType="Long">
+        select distinct
+            sm.id,
+            sm.parent_id parentId,
+            sm.title,
+            sm.perms,
+            sm.type,
+            sm.icon,
+            sm.order_num orderNum,
+            sm.path
+        from tb_menu sm
+        LEFT JOIN tb_role_menu srm on srm.menu_id=sm.id
+        where srm.role_id=#{roleId}
+	</select>
+
+
+    <!--菜单查询-->
+    <select id="queryMenuTypeOne" resultType="com.fantacg.common.pojo.user.Menu">
+        select distinct
+            sm.id,
+            sm.parent_id parentId,
+            sm.title,
+            sm.perms,
+            sm.type,
+            sm.icon,
+            sm.order_num orderNum,
+            sm.path
+        from tb_menu sm
+        WHERE sm.type = 0;
+    </select>
+
+</mapper>

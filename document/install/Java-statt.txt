@@ -1,0 +1,17 @@
+
+测试安装FASTDFS:
+docker run -d --restart=always --privileged=true --net=host --name=fastdfs -e IP=47.106.228.168 -e WEB_PORT=80 -v /usr/local/dpf/fastdfs:/var/local/fdfs registry.cn-beijing.aliyuncs.com/tianzuo/fastdfs
+
+测试JVM 配置
+java -Xms256m -Xmx512m -jar
+-Xms128m -Xmx256m
+
+
+JVM 配置
+java -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xms1024m -Xmx1024m -Xmn256m -Xss256k -XX:SurvivorRatio=8 -XX:+UseConcMarkSweepGC -jar
+
+测试JVM 配置
+nohup java -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m -Xms256m -Xmx512m -Xmn256m -Xss256k -XX:SurvivorRatio=8 -XX:+UseConcMarkSweepGC -jar &
+
+//结束所有Java 程序
+ps -ef|grep java|grep -v grep|cut -c 9-15|xargs kill -9
